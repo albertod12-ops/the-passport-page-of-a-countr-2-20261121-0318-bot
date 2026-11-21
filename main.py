@@ -214,9 +214,9 @@ def draw_spread():
     draw.line([(34, 168), (484, 168)], fill=INK, width=2)
     draw.line([(34, 172), (484, 172)], fill=INK, width=1)
 
-    # photo: wide framing, person further away
+    # photo: medium framing — closer than v4, wider than v2
     portrait = Image.open(PORTRAIT).convert("RGB")
-    crop = portrait.crop((40, 60, 1240, 1780)).resize((170, 244),
+    crop = portrait.crop((300, 600, 1000, 1600)).resize((170, 244),
                                                        Image.LANCZOS)
     img.paste(crop, (34, 184))
     draw.rectangle([34, 184, 204, 428], outline=INK, width=2)
