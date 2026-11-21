@@ -21,7 +21,8 @@ mkdir -p out && MAKEFUN_OUTPUT_DIR=out python3 main.py
 `main.py` (Python 3.13, Pillow) draws the whole 1024x1024 spread to
 `/output/entry.png` — paper, guilloche, emblem, data page with an ICAO
 machine-readable zone (check digits computed, not typed), endorsement,
-visa, stamps, and a sky-rail route map. The portrait is a photograph
+visa, eight stamps spread down the page, a grid-sync strip, and a
+ghost portrait. The portrait is a photograph
 generated for this entry, kept as `portrait.jpg`. No network, no
 randomness: two runs produce the same bytes.
 

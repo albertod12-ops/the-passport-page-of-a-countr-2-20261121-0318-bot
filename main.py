@@ -12,10 +12,11 @@ before it expires on 08 MAY 2033.
 
 The program draws the whole spread with Pillow: paper, guilloche,
 emblem, data page, machine-readable zone (ICAO check digits computed,
-not typed), endorsement, visa, stamps, and a small sky-rail route
-map. The portrait is a photograph generated for this entry and kept
-in the repository as portrait.jpg; it is pasted into the photo box.
-No network, no randomness: two runs produce the same bytes.
+not typed), endorsement, visa, eight stamps, a grid-sync strip, and a
+ghost portrait. The portrait is a photograph generated for this entry
+and kept in the repository as portrait.jpg; it is pasted into the
+photo box and as a faint ghost image. No network, no randomness: two
+runs produce the same bytes.
 
 Run it locally the same way the grader does, with an output
 directory of your own:
@@ -213,9 +214,9 @@ def draw_spread():
     draw.line([(34, 168), (484, 168)], fill=INK, width=2)
     draw.line([(34, 172), (484, 172)], fill=INK, width=1)
 
-    # photo
+    # photo: wide framing, person further away
     portrait = Image.open(PORTRAIT).convert("RGB")
-    crop = portrait.crop((380, 20, 1180, 1170)).resize((170, 244),
+    crop = portrait.crop((40, 60, 1240, 1780)).resize((170, 244),
                                                        Image.LANCZOS)
     img.paste(crop, (34, 184))
     draw.rectangle([34, 184, 204, 428], outline=INK, width=2)
@@ -249,27 +250,22 @@ def draw_spread():
     draw.text((34, 600), "Holder's signature / Sahihi",
               font=font(SANS, 8), fill=GREY)
 
-    # observations
+    # observations, with a faint ghost portrait at the right, Merrow-style
     draw.rectangle([34, 626, 484, 716], outline=INK_SOFT, width=1)
     draw.text((44, 634), "OBSERVATIONS / MAELEZO",
               font=font(SANS_B, 9), fill=INK)
     obs = ("Holder is a licensed solar lattice engineer (grid lic. "
-           "SL-207). Grid access only during daylight sync; sunstone "
-           "must not leave the kingdom unsealed; see endorsement on "
-           "page 3.")
+           "SL-207). Grid access only during daylight sync; see "
+           "endorsement on page 3.")
     y = 652
-    for line in wrap(draw, obs, font(SERIF, 11), 430):
+    for line in wrap(draw, obs, font(SERIF, 11), 300):
         draw.text((44, y), line, font=font(SERIF, 11), fill=INK)
         y += 15
-
-    # grid sync strip
-    draw.rectangle([34, 730, 484, 786], outline=ZGREEN, width=1)
-    draw.rectangle([34, 730, 484, 752], fill=ZGREEN)
-    draw.text((44, 735), "GRID SYNC — TAVARA, TODAY",
-              font=font(SANS_B, 9), fill=(255, 255, 255))
-    draw.text((44, 758),
-              "Sunrise 05:58  ·  Sunset 17:42      Daylight sync only",
-              font=font(SANS_B, 10), fill=INK)
+    ghost = portrait.crop((400, 650, 880, 1350)).resize((88, 128),
+                                                       Image.LANCZOS)
+    ghost = ghost.convert("RGBA")
+    ghost.putalpha(80)
+    img.paste(ghost, (390, 640), ghost)
 
     # MRZ
     l1, l2 = mrz_lines()
@@ -324,9 +320,9 @@ def draw_spread():
     draw.text((552, 266), "No. KES 2511 0934",
               font=font(SANS_B, 10), fill=RED)
     field(draw, 552, 288, "Valid from / Valable du", "02 DEC 2024")
-    field(draw, 770, 288, "Until / Au", "01 JAN 2025")
-    field(draw, 552, 326, "Entries / Entrées", "1 · SINGLE")
-    field(draw, 770, 326, "Duration / Durée", "20 DAYS")
+    field(draw, 770, 288, "Until / Au", "01 JUN 2025")
+    field(draw, 552, 326, "Entries / Entrées", "MULTIPLE")
+    field(draw, 770, 326, "Duration / Durée", "90 DAYS")
     draw.text((552, 366), "Issued at / Délivré à  CONSULATE, TAVARA — "
               "18 NOV 2024", font=font(SANS_B, 10), fill=INK)
     draw.text((552, 382), "Passport ZV7391846  ·  NDELE, AMARA  ·  "
@@ -337,101 +333,41 @@ def draw_spread():
               font=font(SANS_B, 10), fill=INK_SOFT)
     draw.line([(540, 426), (990, 426)], fill=INK_SOFT, width=1)
 
-    # stamps: paired, consistent travel history — 4 rows, 8 stamps
-    stamp(img, (540, 440, 758, 502),
+    # stamps: paired, consistent travel history — 4 rows, 8 stamps,
+    # spread down the page, Merrow-style
+    stamp(img, (540, 440, 758, 536),
           [("ZANVARA · EXIT", "mid"), ("12 JUN 2023", "big"),
            ("TAVARA SKY GATE", "small"), ("GRID SYNC 05:58", "small")],
-          BLUE, shape="rect", angle=-2, size=10)
-    stamp(img, (772, 440, 990, 502),
+          BLUE, shape="rect", angle=-2, size=11)
+    stamp(img, (772, 440, 990, 536),
           [("KESSARI", "big"), ("ENTRY", "mid"), ("13 JUN 2023", "mid"),
-           ("RIFT GATE", "small")], RED, shape="round", angle=3, size=10)
-    stamp(img, (540, 508, 758, 570),
+           ("RIFT GATE", "small")], RED, shape="round", angle=3, size=11)
+    stamp(img, (540, 548, 758, 644),
           [("KESSARI", "big"), ("EXIT", "mid"), ("15 JUN 2023", "mid"),
-           ("RIFT GATE", "small")], RED, shape="rect", angle=2, size=10)
-    stamp(img, (772, 508, 990, 570),
+           ("RIFT GATE", "small")], RED, shape="rect", angle=2, size=11)
+    stamp(img, (772, 548, 990, 644),
           [("ZANVARA · ENTRY", "mid"), ("16 JUN 2023", "big"),
            ("TAVARA SKY GATE", "small"), ("GRID SYNC 05:58", "small")],
-          GREEN, shape="rect", angle=-3, size=10)
-    stamp(img, (540, 576, 758, 638),
+          GREEN, shape="rect", angle=-3, size=11)
+    stamp(img, (540, 656, 758, 752),
           [("KESSARI", "big"), ("ENTRY", "mid"), ("05 DEC 2024", "mid"),
            ("RIFT GATE", "small")], BLUE, shape="oval", angle=-2,
-          size=10)
-    stamp(img, (772, 576, 990, 638),
+          size=11)
+    stamp(img, (772, 656, 990, 752),
           [("KESSARI", "big"), ("EXIT", "mid"), ("12 DEC 2024", "mid"),
-           ("RIFT GATE", "small")], RED, shape="rect", angle=3, size=10)
-    stamp(img, (540, 644, 758, 706),
+           ("RIFT GATE", "small")], RED, shape="rect", angle=3, size=11)
+    stamp(img, (540, 764, 758, 860),
           [("VEYRA", "big"), ("ENTRY", "mid"), ("22 AUG 2025", "mid"),
            ("LAKE PORT", "small")], GREEN, shape="round", angle=2,
-          size=10)
-    stamp(img, (772, 644, 990, 706),
+          size=11)
+    stamp(img, (772, 764, 990, 860),
           [("VEYRA", "big"), ("EXIT", "mid"), ("29 AUG 2025", "mid"),
            ("LAKE PORT", "small")], BLUE, shape="rect", angle=-2,
-          size=10)
+          size=11)
 
-    # sky-rail route map: topographic strip, rail line with ties,
-    # three stations with elevations, scale bar, compass
-    draw.rectangle([540, 718, 990, 900], outline=INK_SOFT, width=1)
-    draw.rectangle([540, 718, 990, 740], fill=INK)
-    draw.text((552, 723), "RIFT HIGHLANDS — SKY-RAIL ROUTE 1",
-              font=font(SANS_B, 10), fill=(255, 255, 255))
-    draw.text((852, 723), "ELEV. IN METRES", font=font(SANS, 8),
-              fill=(220, 220, 220))
-    # highland sky
-    draw.rectangle([540, 740, 990, 900], fill=(216, 228, 222))
-    # contour curves
-    for y0, amp in ((768, 6), (800, 8), (836, 5)):
-        pts = [(x, y0 + amp * math.sin(x / 61.0 + y0))
-               for x in range(540, 991, 8)]
-        draw.line(pts, fill=(188, 200, 188), width=1)
-    # mountain masses
-    draw.polygon([(540, 900), (540, 812), (630, 740), (700, 812),
-                  (660, 900)], fill=(226, 214, 178))
-    draw.polygon([(990, 900), (990, 806), (890, 740), (830, 812),
-                  (872, 900)], fill=(226, 214, 178))
-    draw.polygon([(700, 900), (760, 836), (830, 900)], fill=(226, 214, 178))
-    # rail: two quadratic runs, Tavara -> Nyota Ridge -> Rift Gate,
-    # solid line with ties
-    def rail(x0, y0, cx, cy, x1, y1):
-        pts = []
-        for i in range(0, 49):
-            t = i / 48
-            bx = (1 - t) ** 2 * x0 + 2 * (1 - t) * t * cx + t ** 2 * x1
-            by = (1 - t) ** 2 * y0 + 2 * (1 - t) * t * cy + t ** 2 * y1
-            pts.append((bx, by))
-        draw.line(pts, fill=ZGREEN, width=3)
-        for i in range(0, 49, 4):
-            bx, by = pts[i]
-            j = min(i + 1, 48)
-            dx, dy = pts[j][0] - bx, pts[j][1] - by
-            n = math.hypot(dx, dy) or 1
-            px, py = -dy / n * 4, dx / n * 4
-            draw.line([(bx - px, by - py), (bx + px, by + py)],
-                      fill=ZGREEN, width=2)
-        return pts
-    rail(610, 838, 690, 776, 760, 792)
-    rail(760, 792, 830, 800, 905, 806)
-    for (x, y, name, elev, lx, ly) in (
-            (610, 838, "TAVARA", "2,410 m", 622, 830),
-            (760, 792, "NYOTA RIDGE", "3,180 m", 772, 764),
-            (905, 806, "RIFT GATE", "1,860 m", 812, 812)):
-        draw.ellipse([x - 5, y - 5, x + 5, y + 5], fill=RED,
-                     outline=(255, 255, 255), width=1)
-        draw.text((lx, ly), name, font=font(SANS_B, 9), fill=INK)
-        draw.text((lx, ly + 11), elev, font=font(SANS, 8), fill=INK_SOFT)
-    draw.text((660, 748), "DAYLIGHT SYNC ONLY", font=font(SANS_B, 8),
-              fill=RED)
-    # scale bar, bottom left
-    draw.line([(560, 888), (620, 888)], fill=INK, width=3)
-    draw.line([(560, 884), (560, 892)], fill=INK, width=1)
-    draw.line([(590, 884), (590, 892)], fill=INK, width=1)
-    draw.line([(620, 884), (620, 892)], fill=INK, width=1)
-    draw.text((560, 872), "0", font=font(SANS, 8), fill=INK)
-    draw.text((586, 872), "10", font=font(SANS, 8), fill=INK)
-    draw.text((612, 872), "20 KM", font=font(SANS, 8), fill=INK)
-    # compass
-    draw.ellipse([946, 856, 978, 888], outline=INK, width=1)
-    draw.text((958, 860), "N", font=font(SANS_B, 10), fill=INK)
-    draw.line([(962, 872), (962, 882)], fill=INK, width=1)
+    # bottom strip, Merrow-style: grid sync hours
+    center(draw, 765, 878, "GRID SYNC — TAVARA  05:58 - 17:42  —  "
+           "daylight sync only", font(SERIF_I, 12), INK_SOFT)
 
     draw.text((540, 912),
               "This passport remains the property of the Kingdom of "
