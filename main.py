@@ -1,21 +1,21 @@
-"""Draw the passport spread of the Republic of Marenna as /output/entry.png.
+"""Draw the passport spread of the Kingdom of Zanvara as /output/entry.png.
 
-An invented country that does not exist: a lagoon republic of stilt
-towns on the Grey Lagoon, where the only way in or out is the pole-ferry
-at slack water. The holder, Selma Orren, is a licensed lagoon ferry
-pilot, and every detail of the document agrees with that: her
-occupation, the ferry pilot's endorsement, the lagoon toll stamp, the
-visa from neighbouring Aldorne, and a travel history of paired
-entry/exit stamps, all dated after the passport was issued on
-14 MAR 2023 and before it expires on 13 MAR 2033.
+An invented country that does not exist: a hidden highland kingdom in
+the Great Rift highlands, revealed to the world in 2019, whose
+solar-lattice technology runs on sunstone, a crystal found nowhere
+else. The holder, Amara Ndele, is a licensed solar lattice engineer,
+and every detail of the document agrees with that: her occupation,
+the solar lattice endorsement, the sunstone levy stamp, the visa from
+neighbouring Kessari, and a travel history of paired entry/exit
+stamps, all dated after the passport was issued on 09 MAY 2023 and
+before it expires on 08 MAY 2033.
 
 The program draws the whole spread with Pillow: paper, guilloche,
 emblem, data page, machine-readable zone (ICAO check digits computed,
-not typed), endorsement, visa, stamps, and a small ferry-route map.
-The portrait is a photograph generated for this entry and kept in the
-repository as portrait.jpg; it is pasted into the photo box and as a
-faint ghost image. No network, no randomness: two runs produce the
-same bytes.
+not typed), endorsement, visa, stamps, and a small sky-rail route
+map. The portrait is a photograph generated for this entry and kept
+in the repository as portrait.jpg; it is pasted into the photo box.
+No network, no randomness: two runs produce the same bytes.
 
 Run it locally the same way the grader does, with an output
 directory of your own:
@@ -42,7 +42,7 @@ GREY = (110, 108, 96)
 RED = (163, 51, 39)
 BLUE = (42, 77, 143)
 GREEN = (46, 107, 52)
-TEAL = (15, 95, 92)
+ZGREEN = (14, 59, 46)
 GOLD = (176, 141, 58)
 
 SERIF = "/usr/share/fonts/truetype/noto/NotoSerif-Regular.ttf"
@@ -111,10 +111,10 @@ def check_digit(s):
 
 
 def mrz_lines():
-    line1 = "P<MRNORREN<<SELMA" + "<" * (44 - len("P<MRNORREN<<SELMA"))
-    doc, nat = "MR4829107", "MRN"
-    dob, sex, exp = "810622", "F", "330313"
-    personal = "8106224417<<<<"
+    line1 = "P<ZNVNDELE<<AMARA" + "<" * (44 - len("P<ZNVNDELE<<AMARA"))
+    doc, nat = "ZV7391846", "ZNV"
+    dob, sex, exp = "900214", "F", "330508"
+    personal = "9002145523<<<<"
     body = (doc + check_digit(doc) + nat + dob + check_digit(dob) + sex
             + exp + check_digit(exp) + personal + check_digit(personal))
     line2 = body + check_digit(body)
@@ -161,18 +161,21 @@ def emblem(draw, cx, cy, r, color, width=2):
     draw.ellipse([cx - r, cy - r, cx + r, cy + r], outline=color, width=width)
     draw.ellipse([cx - r + 5, cy - r + 5, cx + r - 5, cy + r - 5],
                  outline=color, width=1)
-    # three lagoon waves
-    for k, yy in enumerate((-8, 0, 8)):
-        pts = []
-        for t in range(-r + 8, r - 7, 4):
-            pts.append((cx + t, cy + yy + 3 * math.sin(t / 9.0 + k)))
-        draw.line(pts, fill=color, width=2)
-    # pole-ferry: hull + pole + small sail
-    draw.line([(cx - 14, cy - 16), (cx + 14, cy - 16)], fill=color, width=2)
-    draw.line([(cx - 10, cy - 16), (cx + 10, cy - 16)], fill=color, width=1)
-    draw.line([(cx + 4, cy - 30), (cx + 4, cy - 16)], fill=color, width=2)
-    draw.polygon([(cx + 4, cy - 30), (cx + 16, cy - 18), (cx + 4, cy - 18)],
+    # sun-disc over the highland peaks
+    draw.ellipse([cx - 7, cy - 20, cx + 7, cy - 6], outline=color, width=2)
+    for ang in range(0, 360, 45):
+        a = math.radians(ang)
+        x1 = cx + 10 * math.cos(a)
+        y1 = cy - 13 + 10 * math.sin(a)
+        x2 = cx + 14 * math.cos(a)
+        y2 = cy - 13 + 14 * math.sin(a)
+        draw.line([(x1, y1), (x2, y2)], fill=color, width=1)
+    # peaks
+    draw.polygon([(cx - 18, cy + 12), (cx - 6, cy - 4), (cx + 2, cy + 12)],
                  outline=color)
+    draw.polygon([(cx - 2, cy + 12), (cx + 10, cy - 8), (cx + 20, cy + 12)],
+                 outline=color)
+    draw.line([(cx - 20, cy + 12), (cx + 22, cy + 12)], fill=color, width=2)
 
 
 def guilloche(draw):
@@ -202,10 +205,10 @@ def draw_spread():
 
     # ================= LEFT PAGE: data page =================
     emblem(draw, 259, 66, 27, INK)
-    center(draw, 259, 100, "REPUBLIC OF MARENNA", font(SERIF_B, 29), INK)
-    center(draw, 259, 132, "MARENNISK REPUBLIKK  ·  REPUBLIKA MARENNA",
+    center(draw, 259, 100, "KINGDOM OF ZANVARA", font(SERIF_B, 29), INK)
+    center(draw, 259, 132, "UFALME WA ZANVARA  ·  KINGDOM OF ZANVARA",
            font(SANS, 10), RED, tracking=1)
-    center(draw, 259, 148, "P A S S A  ·  P A S  ·  P A S S P O R T",
+    center(draw, 259, 148, "P A S S P O R T",
            font(SANS_B, 10), INK_SOFT, tracking=1)
     draw.line([(34, 168), (484, 168)], fill=INK, width=2)
     draw.line([(34, 172), (484, 172)], fill=INK, width=1)
@@ -219,53 +222,53 @@ def draw_spread():
     draw.text((34, 432), "PHOTOGRAPH", font=font(SANS, 7), fill=GREY)
 
     # type / code / number row, right of the photo
-    field(draw, 212, 184, "Type / Slag", "P")
-    field(draw, 272, 184, "Code / Kóð", "MRN")
-    field(draw, 344, 184, "Passport No. / Passa nr.", "MR4829107")
+    field(draw, 212, 184, "Type / Aina", "P")
+    field(draw, 272, 184, "Code / Msimbo", "ZNV")
+    field(draw, 344, 184, "Passport No. / Nambari", "ZV7391846")
     # data fields
-    field(draw, 212, 222, "Surname / Ættarnavn", "ORREN")
-    field(draw, 212, 260, "Given names / Fornavn", "SELMA")
-    field(draw, 212, 298, "Nationality / Ríkisfang", "MARENNIC")
-    field(draw, 212, 336, "Date of birth / Fæðingardagur", "22 JUN 1981")
-    field(draw, 392, 336, "Sex / Kyn", "F")
-    field(draw, 212, 374, "Place of birth / Fæðingarstaður",
-          "VESSA, GREY LAGOON")
-    field(draw, 212, 412, "Personal No. / Kennitala", "810622-4417")
-    field(draw, 212, 450, "Date of issue / Dags útgáfu", "14 MAR 2023")
-    field(draw, 392, 450, "Date of expiry / Gildir til", "13 MAR 2033")
-    field(draw, 212, 488, "Authority / Útgefandi",
-          "PASSPORT OFFICE, PORT VESSA")
-    field(draw, 212, 526, "Occupation / Starf",
-          "LAGOON FERRY PILOT · LIC. FP-118", vsize=13)
+    field(draw, 212, 222, "Surname / Jina la ukoo", "NDELE")
+    field(draw, 212, 260, "Given names / Majina", "AMARA")
+    field(draw, 212, 298, "Nationality / Uraia", "ZANVARAN")
+    field(draw, 212, 336, "Date of birth / Tarehe ya kuzaliwa",
+          "14 FEB 1990")
+    field(draw, 392, 336, "Sex / Jinsia", "F")
+    field(draw, 212, 374, "Place of birth / Mahali pa kuzaliwa",
+          "TAVARA, ZANVARA")
+    field(draw, 212, 412, "Personal No. / Nambari ya kibinafsi",
+          "900214-5523")
+    field(draw, 212, 450, "Date of issue / Tarehe ya kutolewa", "09 MAY 2023")
+    field(draw, 392, 450, "Date of expiry / Muda wake", "08 MAY 2033")
+    field(draw, 212, 488, "Authority / Mamlaka",
+          "PASSPORT OFFICE, TAVARA")
+    field(draw, 212, 526, "Occupation / Kazi",
+          "SOLAR LATTICE ENGINEER · GRID LIC. SL-207", vsize=13)
 
     # signature
-    draw.text((36, 566), "Selma Orren", font=font(SERIF_I, 24), fill=INK)
+    draw.text((36, 566), "Amara Ndele", font=font(SERIF_I, 24), fill=INK)
     draw.line([(34, 596), (240, 596)], fill=INK, width=1)
-    draw.text((34, 600), "Holder's signature / Undirskrift",
+    draw.text((34, 600), "Holder's signature / Sahihi",
               font=font(SANS, 8), fill=GREY)
-
-    # (ghost portrait omitted: the data column leaves no clear spot for
-    # a second image without covering a field)
 
     # observations
     draw.rectangle([34, 626, 484, 716], outline=INK_SOFT, width=1)
-    draw.text((44, 634), "OBSERVATIONS / ATHUGASEMDIR",
+    draw.text((44, 634), "OBSERVATIONS / MAELEZO",
               font=font(SANS_B, 9), fill=INK)
-    obs = ("Holder is a licensed lagoon ferry pilot (lic. FP-118). "
-           "Crossings only at slack water; pole-ferry only; "
-           "see endorsement on page 3.")
+    obs = ("Holder is a licensed solar lattice engineer (grid lic. "
+           "SL-207). Grid access only during daylight sync; sunstone "
+           "must not leave the kingdom unsealed; see endorsement on "
+           "page 3.")
     y = 652
     for line in wrap(draw, obs, font(SERIF, 11), 430):
         draw.text((44, y), line, font=font(SERIF, 11), fill=INK)
         y += 15
 
-    # tide strip
-    draw.rectangle([34, 730, 484, 786], outline=TEAL, width=1)
-    draw.rectangle([34, 730, 484, 752], fill=TEAL)
-    draw.text((44, 735), "TIDE CARD — VESSA GATE, TODAY",
+    # grid sync strip
+    draw.rectangle([34, 730, 484, 786], outline=ZGREEN, width=1)
+    draw.rectangle([34, 730, 484, 752], fill=ZGREEN)
+    draw.text((44, 735), "GRID SYNC — TAVARA, TODAY",
               font=font(SANS_B, 9), fill=(255, 255, 255))
     draw.text((44, 758),
-              "Low water 06:41  ·  18:57      Slack ± 2 h      Pole-ferry only",
+              "Sunrise 05:58  ·  Sunset 17:42      Daylight sync only",
               font=font(SANS_B, 10), fill=INK)
 
     # MRZ
@@ -274,7 +277,7 @@ def draw_spread():
                    outline=INK_SOFT, width=1)
     draw.text((44, 816), l1, font=font(MONO, 13), fill=INK)
     draw.text((44, 840), l2, font=font(MONO, 13), fill=INK)
-    draw.text((34, 884), "LANGUAGES OF ISSUE: MARENNIC · ENGLISH   |   "
+    draw.text((34, 884), "LANGUAGES OF ISSUE: ZANVARAN · ENGLISH   |   "
               "ICAO 9303 BIOMETRIC", font=font(SANS, 8), fill=GREY)
     center(draw, 259, 972, "2", font(SERIF, 12), INK_SOFT)
 
@@ -286,101 +289,100 @@ def draw_spread():
 
     # endorsement box
     draw.rectangle([540, 76, 990, 218], outline=INK, width=2)
-    draw.text((552, 86), "FERRY PILOT'S ENDORSEMENT 1 / 2023 · GREY LAGOON",
+    draw.text((552, 86), "SOLAR LATTICE ENGINEER'S ENDORSEMENT 2 / 2023",
               font=font(SANS_B, 11), fill=INK)
     draw.line([(552, 106), (978, 106)], fill=INK_SOFT, width=1)
-    body = ("The holder is a licensed lagoon ferry pilot (lic. FP-118). "
-            "Crossings are valid only at slack water, within ± 2 h of low "
-            "tide posted at the Vessa tide gate. Pole-ferry only; no motor "
-            "after dark. The tide card issued with this passport must be "
-            "carried.")
+    body = ("The holder is a licensed solar lattice engineer (grid lic. "
+            "SL-207), authorised to service the Sunstone Grid. Grid "
+            "access only during daylight sync, within ± 1 h of sunrise "
+            "and sunset at the Tavara grid gate. Sunstone must not leave "
+            "the kingdom unsealed.")
     y = 114
     for line in wrap(draw, body, font(SERIF, 12), 290):
         draw.text((552, y), line, font=font(SERIF, 12), fill=INK)
         y += 16
-    draw.text((552, 196), "Port Vessa, 14 MAR 2023",
+    draw.text((552, 196), "Tavara, 09 MAY 2023",
               font=font(SERIF_I, 11), fill=INK_SOFT)
-    # toll stamp, overlapping the endorsement corner
+    # sunstone levy stamp, overlapping the endorsement corner
     stamp(img, (856, 128, 976, 196),
-          [("MARENNA", "mid"), ("LAGOON TOLL", "mid"), ("12 MRK", "big"),
+          [("ZANVARA", "mid"), ("SUNSTONE LEVY", "mid"), ("40 ZVK", "big"),
            ("PAID", "mid")], RED, shape="rect", angle=-7, size=10)
 
-    # Aldorne visa
+    # Kessari visa
     draw.rectangle([540, 232, 990, 396], fill=(232, 240, 228),
                    outline=GREEN, width=2)
     draw.rectangle([540, 232, 990, 258], fill=GREEN)
-    draw.text((552, 238), "CONFEDERATION OF ALDORNE — SHORT-STAY VISA",
+    draw.text((552, 238), "REPUBLIC OF KESSARI — SHORT-STAY VISA",
               font=font(SANS_B, 11), fill=(255, 255, 255))
     draw.text((930, 238), "VISA C", font=font(SANS_B, 11),
               fill=(255, 255, 255))
-    draw.text((552, 266), "No. ALD 2407 1188",
+    draw.text((552, 266), "No. KES 2511 0934",
               font=font(SANS_B, 10), fill=RED)
-    field(draw, 552, 288, "Valid from / Valable du", "01 NOV 2024")
-    field(draw, 770, 288, "Until / Au", "30 NOV 2024")
+    field(draw, 552, 288, "Valid from / Valable du", "02 DEC 2024")
+    field(draw, 770, 288, "Until / Au", "01 JAN 2025")
     field(draw, 552, 326, "Entries / Entrées", "1 · SINGLE")
-    field(draw, 770, 326, "Duration / Durée", "15 DAYS")
-    draw.text((552, 366), "Issued at / Délivré à  CONSULATE, PORT VESSA — "
-              "22 OCT 2024", font=font(SANS_B, 10), fill=INK)
-    draw.text((552, 382), "Passport MR4829107  ·  ORREN, SELMA  ·  "
-              "ENTRY BY VESSA FERRY GATE · FEE 35 ALD PAID",
+    field(draw, 770, 326, "Duration / Durée", "20 DAYS")
+    draw.text((552, 366), "Issued at / Délivré à  CONSULATE, TAVARA — "
+              "18 NOV 2024", font=font(SANS_B, 10), fill=INK)
+    draw.text((552, 382), "Passport ZV7391846  ·  NDELE, AMARA  ·  "
+              "ENTRY BY RIFT GATE SKY-RAIL · FEE 45 KES PAID",
               font=font(SANS, 9), fill=INK_SOFT)
 
-    draw.text((540, 408), "ENTRY AND EXIT  ·  INNKOMA OG ÚTFÖR",
+    draw.text((540, 408), "ENTRY AND EXIT  ·  KUINGIA NA KUTOKA",
               font=font(SANS_B, 10), fill=INK_SOFT)
     draw.line([(540, 426), (990, 426)], fill=INK_SOFT, width=1)
 
     # stamps: paired, consistent travel history
     stamp(img, (540, 440, 758, 512),
-          [("MARENNA · UTFÖR / EXIT", "mid"), ("06 MAY 2023", "big"),
-           ("VESSA FERRY GATE", "small"), ("LOW WATER 06:41", "small")],
+          [("ZANVARA · EXIT", "mid"), ("12 JUN 2023", "big"),
+           ("TAVARA SKY GATE", "small"), ("GRID SYNC 05:58", "small")],
           BLUE, shape="rect", angle=-2, size=11)
     stamp(img, (772, 440, 990, 512),
-          [("DRAVIA", "big"), ("ENTRY", "mid"), ("07 MAY 2023", "mid"),
-           ("NORTH QUAY", "small")], RED, shape="round", angle=3, size=11)
+          [("KESSARI", "big"), ("ENTRY", "mid"), ("13 JUN 2023", "mid"),
+           ("RIFT GATE", "small")], RED, shape="round", angle=3, size=11)
     stamp(img, (540, 524, 758, 596),
-          [("DRAVIA", "big"), ("EXIT", "mid"), ("09 MAY 2023", "mid"),
-           ("NORTH QUAY", "small")], RED, shape="rect", angle=2, size=11)
+          [("KESSARI", "big"), ("EXIT", "mid"), ("15 JUN 2023", "mid"),
+           ("RIFT GATE", "small")], RED, shape="rect", angle=2, size=11)
     stamp(img, (772, 524, 990, 596),
-          [("MARENNA · INNKOMA / ENTRY", "mid"), ("10 MAY 2023", "big"),
-           ("VESSA FERRY GATE", "small"), ("LOW WATER 06:58", "small")],
+          [("ZANVARA · ENTRY", "mid"), ("16 JUN 2023", "big"),
+           ("TAVARA SKY GATE", "small"), ("GRID SYNC 05:58", "small")],
           GREEN, shape="rect", angle=-3, size=11)
     stamp(img, (540, 608, 758, 680),
-          [("ALDORNE", "big"), ("ENTRY", "mid"), ("14 NOV 2024", "mid"),
-           ("FERRY GATE 2", "small")], BLUE, shape="oval", angle=-2,
-          size=11)
+          [("KESSARI", "big"), ("ENTRY", "mid"), ("05 DEC 2024", "mid")],
+          BLUE, shape="oval", angle=-2, size=11)
     stamp(img, (772, 608, 990, 680),
-          [("ALDORNE", "big"), ("EXIT", "mid"), ("17 NOV 2024", "mid"),
-           ("FERRY GATE 2", "small")], RED, shape="rect", angle=3, size=11)
+          [("KESSARI", "big"), ("EXIT", "mid"), ("12 DEC 2024", "mid"),
+           ("RIFT GATE", "small")], RED, shape="rect", angle=3, size=11)
 
-    # ferry-route map
+    # sky-rail route map
     draw.rectangle([540, 694, 990, 900], outline=INK_SOFT, width=1)
     draw.rectangle([540, 694, 990, 716], fill=INK)
-    draw.text((552, 699), "GREY LAGOON — FERRY ROUTE 2",
+    draw.text((552, 699), "RIFT HIGHLANDS — SKY-RAIL ROUTE 1",
               font=font(SANS_B, 10), fill=(255, 255, 255))
     draw.text((900, 699), "NOT TO SCALE", font=font(SANS, 8),
               fill=(220, 220, 220))
-    # lagoon water
-    draw.rectangle([540, 716, 990, 900], fill=(214, 228, 232))
-    # land masses
-    draw.polygon([(540, 716), (660, 716), (640, 790), (560, 830),
-                  (540, 860)], fill=(226, 214, 178))
-    draw.polygon([(990, 716), (880, 716), (900, 800), (990, 860)],
-                 fill=(226, 214, 178))
+    # highland sky
+    draw.rectangle([540, 716, 990, 900], fill=(216, 228, 222))
+    # mountain masses
+    draw.polygon([(540, 900), (540, 800), (640, 716), (700, 800),
+                  (660, 900)], fill=(226, 214, 178))
+    draw.polygon([(990, 900), (990, 790), (880, 716), (830, 800),
+                  (870, 900)], fill=(226, 214, 178))
     draw.polygon([(700, 900), (760, 830), (830, 900)], fill=(226, 214, 178))
-    # route: smooth dashed curve Vessa -> North Quay
-    x0, y0, cx, cy, x1, y1 = 610, 800, 760, 690, 905, 758
+    # route: smooth dashed curve Tavara -> Rift Gate
+    x0, y0, cx, cy, x1, y1 = 610, 820, 760, 700, 905, 770
     for i in range(0, 25):
         t = i / 24
         bx = (1 - t) ** 2 * x0 + 2 * (1 - t) * t * cx + t ** 2 * x1
         by = (1 - t) ** 2 * y0 + 2 * (1 - t) * t * cy + t ** 2 * y1
         if i % 2 == 0:
             draw.ellipse([bx - 2, by - 2, bx + 2, by + 2], fill=RED)
-    for (x, y, name) in ((610, 800, "VESSA"), (905, 758, "NORTH QUAY"),
-                         (760, 858, "TORMUND SANDS")):
+    for (x, y, name) in ((610, 820, "TAVARA"), (905, 770, "RIFT GATE"),
+                         (760, 868, "NYOTA RIDGE")):
         draw.ellipse([x - 5, y - 5, x + 5, y + 5], fill=RED,
                      outline=(255, 255, 255), width=1)
         draw.text((x + 8, y - 6), name, font=font(SANS_B, 9), fill=INK)
-    draw.text((600, 830), "SLACK WATER ONLY", font=font(SANS_B, 8),
+    draw.text((600, 845), "DAYLIGHT SYNC ONLY", font=font(SANS_B, 8),
               fill=RED)
     # compass
     draw.ellipse([946, 856, 978, 888], outline=INK, width=1)
@@ -388,11 +390,11 @@ def draw_spread():
     draw.line([(962, 872), (962, 882)], fill=INK, width=1)
 
     draw.text((540, 912),
-              "This passport remains the property of the Republic of "
-              "Marenna.", font=font(SERIF_I, 11), fill=INK_SOFT)
+              "This passport remains the property of the Kingdom of "
+              "Zanvara.", font=font(SERIF_I, 11), fill=INK_SOFT)
     draw.text((540, 930), "If found, return to the Passport Office, "
-              "Port Vessa.", font=font(SERIF_I, 11), fill=INK_SOFT)
-    draw.text((920, 972), "MR4829107", font=font(SANS, 9), fill=GREY)
+              "Tavara.", font=font(SERIF_I, 11), fill=INK_SOFT)
+    draw.text((920, 972), "ZV7391846", font=font(SANS, 9), fill=GREY)
     return img
 
 
