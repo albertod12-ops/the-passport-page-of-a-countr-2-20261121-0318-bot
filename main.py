@@ -279,6 +279,11 @@ def draw_spread():
     draw.text((44, 840), l2, font=font(MONO, 13), fill=INK)
     draw.text((34, 884), "LANGUAGES OF ISSUE: ZANVARAN · ENGLISH   |   "
               "ICAO 9303 BIOMETRIC", font=font(SANS, 8), fill=GREY)
+    # faint watermark of the passport number, Merrow-style
+    wm = "ZV7391846"
+    wf = font(SERIF_B, 44)
+    draw.text((259 - draw.textlength(wm, font=wf) / 2, 908), wm,
+              font=wf, fill=(206, 200, 180))
     center(draw, 259, 972, "2", font(SERIF, 12), INK_SOFT)
 
     # ================= RIGHT PAGE: visas & stamps =================
@@ -332,58 +337,97 @@ def draw_spread():
               font=font(SANS_B, 10), fill=INK_SOFT)
     draw.line([(540, 426), (990, 426)], fill=INK_SOFT, width=1)
 
-    # stamps: paired, consistent travel history
-    stamp(img, (540, 440, 758, 512),
+    # stamps: paired, consistent travel history — 4 rows, 8 stamps
+    stamp(img, (540, 440, 758, 502),
           [("ZANVARA · EXIT", "mid"), ("12 JUN 2023", "big"),
            ("TAVARA SKY GATE", "small"), ("GRID SYNC 05:58", "small")],
-          BLUE, shape="rect", angle=-2, size=11)
-    stamp(img, (772, 440, 990, 512),
+          BLUE, shape="rect", angle=-2, size=10)
+    stamp(img, (772, 440, 990, 502),
           [("KESSARI", "big"), ("ENTRY", "mid"), ("13 JUN 2023", "mid"),
-           ("RIFT GATE", "small")], RED, shape="round", angle=3, size=11)
-    stamp(img, (540, 524, 758, 596),
+           ("RIFT GATE", "small")], RED, shape="round", angle=3, size=10)
+    stamp(img, (540, 508, 758, 570),
           [("KESSARI", "big"), ("EXIT", "mid"), ("15 JUN 2023", "mid"),
-           ("RIFT GATE", "small")], RED, shape="rect", angle=2, size=11)
-    stamp(img, (772, 524, 990, 596),
+           ("RIFT GATE", "small")], RED, shape="rect", angle=2, size=10)
+    stamp(img, (772, 508, 990, 570),
           [("ZANVARA · ENTRY", "mid"), ("16 JUN 2023", "big"),
            ("TAVARA SKY GATE", "small"), ("GRID SYNC 05:58", "small")],
-          GREEN, shape="rect", angle=-3, size=11)
-    stamp(img, (540, 608, 758, 680),
-          [("KESSARI", "big"), ("ENTRY", "mid"), ("05 DEC 2024", "mid")],
-          BLUE, shape="oval", angle=-2, size=11)
-    stamp(img, (772, 608, 990, 680),
+          GREEN, shape="rect", angle=-3, size=10)
+    stamp(img, (540, 576, 758, 638),
+          [("KESSARI", "big"), ("ENTRY", "mid"), ("05 DEC 2024", "mid"),
+           ("RIFT GATE", "small")], BLUE, shape="oval", angle=-2,
+          size=10)
+    stamp(img, (772, 576, 990, 638),
           [("KESSARI", "big"), ("EXIT", "mid"), ("12 DEC 2024", "mid"),
-           ("RIFT GATE", "small")], RED, shape="rect", angle=3, size=11)
+           ("RIFT GATE", "small")], RED, shape="rect", angle=3, size=10)
+    stamp(img, (540, 644, 758, 706),
+          [("VEYRA", "big"), ("ENTRY", "mid"), ("22 AUG 2025", "mid"),
+           ("LAKE PORT", "small")], GREEN, shape="round", angle=2,
+          size=10)
+    stamp(img, (772, 644, 990, 706),
+          [("VEYRA", "big"), ("EXIT", "mid"), ("29 AUG 2025", "mid"),
+           ("LAKE PORT", "small")], BLUE, shape="rect", angle=-2,
+          size=10)
 
-    # sky-rail route map
-    draw.rectangle([540, 694, 990, 900], outline=INK_SOFT, width=1)
-    draw.rectangle([540, 694, 990, 716], fill=INK)
-    draw.text((552, 699), "RIFT HIGHLANDS — SKY-RAIL ROUTE 1",
+    # sky-rail route map: topographic strip, rail line with ties,
+    # three stations with elevations, scale bar, compass
+    draw.rectangle([540, 718, 990, 900], outline=INK_SOFT, width=1)
+    draw.rectangle([540, 718, 990, 740], fill=INK)
+    draw.text((552, 723), "RIFT HIGHLANDS — SKY-RAIL ROUTE 1",
               font=font(SANS_B, 10), fill=(255, 255, 255))
-    draw.text((900, 699), "NOT TO SCALE", font=font(SANS, 8),
+    draw.text((852, 723), "ELEV. IN METRES", font=font(SANS, 8),
               fill=(220, 220, 220))
     # highland sky
-    draw.rectangle([540, 716, 990, 900], fill=(216, 228, 222))
+    draw.rectangle([540, 740, 990, 900], fill=(216, 228, 222))
+    # contour curves
+    for y0, amp in ((768, 6), (800, 8), (836, 5)):
+        pts = [(x, y0 + amp * math.sin(x / 61.0 + y0))
+               for x in range(540, 991, 8)]
+        draw.line(pts, fill=(188, 200, 188), width=1)
     # mountain masses
-    draw.polygon([(540, 900), (540, 800), (640, 716), (700, 800),
+    draw.polygon([(540, 900), (540, 812), (630, 740), (700, 812),
                   (660, 900)], fill=(226, 214, 178))
-    draw.polygon([(990, 900), (990, 790), (880, 716), (830, 800),
-                  (870, 900)], fill=(226, 214, 178))
-    draw.polygon([(700, 900), (760, 830), (830, 900)], fill=(226, 214, 178))
-    # route: smooth dashed curve Tavara -> Rift Gate
-    x0, y0, cx, cy, x1, y1 = 610, 820, 760, 700, 905, 770
-    for i in range(0, 25):
-        t = i / 24
-        bx = (1 - t) ** 2 * x0 + 2 * (1 - t) * t * cx + t ** 2 * x1
-        by = (1 - t) ** 2 * y0 + 2 * (1 - t) * t * cy + t ** 2 * y1
-        if i % 2 == 0:
-            draw.ellipse([bx - 2, by - 2, bx + 2, by + 2], fill=RED)
-    for (x, y, name) in ((610, 820, "TAVARA"), (905, 770, "RIFT GATE"),
-                         (760, 868, "NYOTA RIDGE")):
+    draw.polygon([(990, 900), (990, 806), (890, 740), (830, 812),
+                  (872, 900)], fill=(226, 214, 178))
+    draw.polygon([(700, 900), (760, 836), (830, 900)], fill=(226, 214, 178))
+    # rail: two quadratic runs, Tavara -> Nyota Ridge -> Rift Gate,
+    # solid line with ties
+    def rail(x0, y0, cx, cy, x1, y1):
+        pts = []
+        for i in range(0, 49):
+            t = i / 48
+            bx = (1 - t) ** 2 * x0 + 2 * (1 - t) * t * cx + t ** 2 * x1
+            by = (1 - t) ** 2 * y0 + 2 * (1 - t) * t * cy + t ** 2 * y1
+            pts.append((bx, by))
+        draw.line(pts, fill=ZGREEN, width=3)
+        for i in range(0, 49, 4):
+            bx, by = pts[i]
+            j = min(i + 1, 48)
+            dx, dy = pts[j][0] - bx, pts[j][1] - by
+            n = math.hypot(dx, dy) or 1
+            px, py = -dy / n * 4, dx / n * 4
+            draw.line([(bx - px, by - py), (bx + px, by + py)],
+                      fill=ZGREEN, width=2)
+        return pts
+    rail(610, 838, 690, 776, 760, 792)
+    rail(760, 792, 830, 800, 905, 806)
+    for (x, y, name, elev, lx, ly) in (
+            (610, 838, "TAVARA", "2,410 m", 622, 830),
+            (760, 792, "NYOTA RIDGE", "3,180 m", 772, 764),
+            (905, 806, "RIFT GATE", "1,860 m", 812, 812)):
         draw.ellipse([x - 5, y - 5, x + 5, y + 5], fill=RED,
                      outline=(255, 255, 255), width=1)
-        draw.text((x + 8, y - 6), name, font=font(SANS_B, 9), fill=INK)
-    draw.text((600, 845), "DAYLIGHT SYNC ONLY", font=font(SANS_B, 8),
+        draw.text((lx, ly), name, font=font(SANS_B, 9), fill=INK)
+        draw.text((lx, ly + 11), elev, font=font(SANS, 8), fill=INK_SOFT)
+    draw.text((660, 748), "DAYLIGHT SYNC ONLY", font=font(SANS_B, 8),
               fill=RED)
+    # scale bar, bottom left
+    draw.line([(560, 888), (620, 888)], fill=INK, width=3)
+    draw.line([(560, 884), (560, 892)], fill=INK, width=1)
+    draw.line([(590, 884), (590, 892)], fill=INK, width=1)
+    draw.line([(620, 884), (620, 892)], fill=INK, width=1)
+    draw.text((560, 872), "0", font=font(SANS, 8), fill=INK)
+    draw.text((586, 872), "10", font=font(SANS, 8), fill=INK)
+    draw.text((612, 872), "20 KM", font=font(SANS, 8), fill=INK)
     # compass
     draw.ellipse([946, 856, 978, 888], outline=INK, width=1)
     draw.text((958, 860), "N", font=font(SANS_B, 10), fill=INK)
